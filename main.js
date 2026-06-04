@@ -901,6 +901,7 @@ class BeerScene extends Phaser.Scene {
     const targetX = side === "left" ? 168 : GAME_WIDTH - 168;
     this.customerActors.forEach((actor, index) => {
       const asset = assets[index] || null;
+      const hasAssetTexture = !!asset && this.textures.exists(asset);
       const isActive = index < Math.max(1, assets.length || 1);
       actor.setVisible(isActive);
       actor.activeCustomer = isActive;
@@ -914,10 +915,10 @@ class BeerScene extends Phaser.Scene {
       actor.parts.shadow.clear();
       actor.parts.shadow.fillStyle(0x0f172a, 0.22);
       actor.parts.shadow.fillEllipse(0, 4, 84, 18);
-      actor.parts.sprite.setVisible(!!asset);
-      actor.parts.fallback.setVisible(!asset);
-      actor.parts.fallbackText.setVisible(!asset);
-      if (asset) {
+      actor.parts.sprite.setVisible(hasAssetTexture);
+      actor.parts.fallback.setVisible(!hasAssetTexture);
+      actor.parts.fallbackText.setVisible(!hasAssetTexture);
+      if (hasAssetTexture) {
         actor.parts.sprite.setTexture(asset);
         const targetHeight = customer.key === "drunk" ? 170 : 158;
         actor.parts.sprite.setScale(targetHeight / actor.parts.sprite.height);
