@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#101820" />
+    <title>啤酒模拟器 MVP</title>
+    <link rel="stylesheet" href="style.css?v=beer-mvp-12" />
+  </head>
+  <body>
+    <main id="app">
+      <div id="gameHost"></div>
+
+      <section id="menuScreen" class="overlay menu">
+        <div class="title-block">
+          <p class="eyebrow">3天内被买走，否则命运很泡沫</p>
+          <h1>啤酒模拟器</h1>
+          <p>你是一瓶啤酒。滚到前排、把标签转正、祈祷顾客懂你。滚太猛会碎，躺太久会过期。</p>
+          <p class="notice">本游戏为虚构搞笑作品。未成年人请勿饮酒，请理性饮酒。</p>
+        </div>
+
+        <div class="panel">
+          <div class="row"><span>本地通关</span><strong id="statWins">0</strong></div>
+          <div class="row"><span>摔碎次数</span><strong id="statBreaks">0</strong></div>
+          <div class="row"><span>过期次数</span><strong id="statExpired">0</strong></div>
+          <div class="row"><span>最高评分</span><strong id="statBestScore">0</strong></div>
+          <div class="row"><span>总积分</span><strong id="statTotalPoints">0</strong></div>
+          <div class="row"><span>最高连胜</span><strong id="statBestStreak">0</strong></div>
+          <button id="startButton" class="primary">开始本局</button>
+          <button id="pointsButton" class="secondary">查看积分</button>
+          <button id="dressButton" class="secondary">装扮</button>
+          <button id="shopAdButton" class="secondary">看广告获得积分奖励</button>
+          <button id="settingsButton" class="ghost">设置</button>
+          <button id="tiltButton" class="secondary">启用手机倾斜</button>
+          <button id="resetButton" class="ghost">重置存档</button>
+        </div>
+
+        <div class="tips">
+          <span>A / D 左右滚</span>
+          <span>W / S 前后滚</span>
+          <span>Space 转标签</span>
+          <span>点击屏幕转标签</span>
+          <span>1 / 2 / 3 切换视角</span>
+        </div>
+      </section>
+
+      <section id="pointsScreen" class="overlay hidden">
+        <div class="panel">
+          <p class="eyebrow">本地积分</p>
+          <h2>积分记录</h2>
+          <div class="row"><span>总积分</span><strong id="pointsTotal">0</strong></div>
+          <div class="row"><span>历史最高分</span><strong id="pointsBest">0</strong></div>
+          <div class="row"><span>最高连胜</span><strong id="pointsBestStreak">0</strong></div>
+          <div class="row"><span>通关次数</span><strong id="pointsWins">0</strong></div>
+          <div class="row"><span>失败次数</span><strong id="pointsFailures">0</strong></div>
+          <div class="row"><span>广告积分次数</span><strong id="pointsAdUses">0</strong></div>
+          <button id="pointsBackButton" class="ghost">返回</button>
+        </div>
+      </section>
+
+      <section id="settingsScreen" class="overlay hidden">
+        <div class="panel">
+          <p class="eyebrow">网页版设置</p>
+          <h2>设置</h2>
+          <p class="settings-copy">本版本可直接用静态服务器运行，例如 python -m http.server 8000，然后访问 http://localhost:8000。</p>
+          <div class="row"><span>平台</span><strong id="settingsPlatform">Web</strong></div>
+          <div class="row"><span>手机倾斜</span><strong id="settingsTilt">可手动启用</strong></div>
+          <div class="row"><span>广告</span><strong>Mock 1秒</strong></div>
+          <button id="settingsBackButton" class="ghost">返回</button>
+        </div>
+      </section>
+
+      <section id="hud" class="hud hidden">
+        <div class="hud-top">
+          <div><span>天数</span><strong id="hudDay">Day 1</strong></div>
+          <div><span>剩余</span><strong id="hudTime">03:00</strong></div>
+          <div><span>场景</span><strong id="hudScene">超市货架</strong></div>
+          <div><span>位置</span><strong id="hudLane">中排</strong></div>
+          <div><span>标签</span><strong id="hudLabel">正面朝外</strong></div>
+          <div><span>属性</span><strong id="hudTrait">便宜</strong></div>
+          <div><span>完整度</span><strong id="hudIntegrity">100</strong></div>
+          <div><span>积分</span><strong id="hudRunPoints">0</strong></div>
+          <div><span>总分</span><strong id="hudTotalPoints">0</strong></div>
+          <div><span>连胜</span><strong id="hudStreak">0</strong></div>
+          <div><span>等待</span><strong id="hudWaits">0</strong></div>
+        </div>
+
+        <div class="meter-panel">
+          <label><span>曝光</span><i><b id="exposureFill"></b></i></label>
+          <label><span>完整</span><i><b id="integrityFill"></b></i></label>
+          <label><span>危险</span><i><b id="dangerFill"></b></i></label>
+          <p id="hudMessage">轻轻滚到前排，别把自己滚成玻璃渣。</p>
+          <div class="stealth-controls">
+            <button id="stealthButton" type="button">使用隐身贴纸 x0</button>
+            <button id="adStickerButton" type="button">看广告获得隐身贴纸</button>
+          </div>
+        </div>
+
+        <div id="demonWarning" class="demon-warning hidden">
+          <strong>危险！魔王即将进入商店！</strong>
+        </div>
+
+        <div id="customerCard" class="customer-card hidden">
+          <span id="customerEmoji">🧍</span>
+          <strong id="customerName">顾客</strong>
+          <p id="customerAction">正在观察货架...</p>
+          <p id="customerPoints">预计积分：0</p>
+        </div>
+
+        <div class="view-switch" aria-label="视角切换">
+          <button id="viewLeftButton" type="button">左斜</button>
+          <button id="viewCenterButton" type="button">正斜</button>
+          <button id="viewRightButton" type="button">右斜</button>
+        </div>
+      </section>
+
+      <section id="resultScreen" class="overlay hidden">
+        <div class="panel result">
+          <p class="eyebrow" id="resultKicker">本局结算</p>
+          <h2 id="resultTitle">你被买走了</h2>
+          <div class="row"><span>结局</span><strong id="resultEnding">被买走</strong></div>
+          <div class="row"><span>被买用时</span><strong id="resultDays">无人在意</strong></div>
+          <div class="row"><span>购买顾客</span><strong id="resultBuyer">学生</strong></div>
+          <div class="row"><span>偏好匹配</span><strong id="resultMatch">是</strong></div>
+          <div class="row"><span>使用复活</span><strong id="resultRevive">否</strong></div>
+          <div class="row"><span>买走基础积分</span><strong id="resultSalePoints">0</strong></div>
+          <div class="row"><span>魔王躲避积分</span><strong id="resultDemonPoints">0</strong></div>
+          <div class="row"><span>等待奖励</span><strong id="resultWaitPoints">0</strong></div>
+          <div class="row"><span>连胜倍率</span><strong id="resultStreakMultiplier">x1.0</strong></div>
+          <div class="row"><span>最终积分</span><strong id="resultScore">0</strong></div>
+          <div class="row"><span>双倍广告</span><strong id="resultDoubleAd">否</strong></div>
+          <div class="row"><span>加入后总积分</span><strong id="resultTotalPoints">0</strong></div>
+          <button id="doubleScoreButton" class="primary">观看广告获得双倍积分</button>
+          <button id="reviveButton" class="primary hidden">看广告复活</button>
+          <button id="nextButton" class="secondary">下一局</button>
+          <button id="menuButton" class="ghost">返回菜单</button>
+        </div>
+      </section>
+
+      <section id="dressScreen" class="overlay hidden">
+        <div class="panel dress-panel">
+          <p class="eyebrow">贴纸式装扮</p>
+          <h2>自由装扮</h2>
+          <label class="dress-field"><span>对象</span><select id="dressTargetSelect"></select></label>
+          <label id="dressCategoryField" class="dress-field"><span>分类</span><select id="dressCategorySelect"></select></label>
+          <label class="dress-field"><span>装饰</span><select id="dressDecorationSelect"></select></label>
+          <div id="dressCanvas" class="dress-canvas"></div>
+          <div class="dress-tools">
+            <label><span>缩放</span><input id="dressScale" type="range" min="0.2" max="2.5" step="0.05" value="1" /></label>
+            <label><span>旋转</span><input id="dressRotation" type="range" min="-180" max="180" step="1" value="0" /></label>
+          </div>
+          <button id="dressAddButton" class="secondary">添加装饰</button>
+          <button id="dressDeleteButton" class="ghost">删除选中装饰</button>
+          <button id="dressSaveButton" class="primary">保存</button>
+          <button id="dressResetButton" class="ghost">重置当前对象</button>
+          <button id="dressBackButton" class="ghost">返回</button>
+        </div>
+      </section>
+
+      <section id="loadingScreen" class="loading">
+        <strong>正在装瓶...</strong>
+        <span>如果停留太久，请确认 Phaser 与脚本资源可以加载。</span>
+      </section>
+    </main>
+
+    <script>
+      window.addEventListener("error", function (event) {
+        var loading = document.getElementById("loadingScreen");
+        if (!loading) return;
+        loading.classList.remove("hidden");
+        loading.querySelector("strong").textContent = "页面脚本出错";
+        loading.querySelector("span").textContent = event.message + " @ " + event.filename + ":" + event.lineno;
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
+    <script>
+      if (!window.Phaser) {
+        document.write('<script src="vendor/phaser.min.js"><\\/script>');
+      }
+    </script>
+    <script src="platform.js?v=beer-mvp-12"></script>
+    <script src="main.js?v=beer-mvp-12"></script>
+  </body>
+</html>

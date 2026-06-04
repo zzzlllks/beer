@@ -1,0 +1,12 @@
+{
+  "name": "beer-simulator-web-mvp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "啤酒模拟器网页版 MVP，HTML5 + Phaser 3 静态小游戏。",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "serve": "python -m http.server 8000",
+    "check": "node --check main.js && node --check platform.js",
+    "deploy:vercel": "npx vercel --prod"
+  }
+}
