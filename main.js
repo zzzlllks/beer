@@ -368,6 +368,12 @@ class BeerScene extends Phaser.Scene {
     this.populateShelf();
     unlockCodex("beers", this.run.trait.key);
     unlockCodex("scenes", this.run.scene.key);
+    this.beer.setVisible(true);
+    this.beer.setAlpha(1);
+    this.beerBody.setVisible(true);
+    this.beerLabel.setVisible(true);
+    this.shadow.clear();
+    this.beerLocator.clear();
     this.drawScene();
     this.updateBeerArt();
     this.applyBeerDress();
@@ -946,11 +952,23 @@ class BeerScene extends Phaser.Scene {
     bubble.setVisible(!!quote);
     bubbleText.setVisible(!!quote);
     if (!quote) return;
+    bubbleText.setStyle({
+      fontFamily: "system-ui, sans-serif",
+      fontSize: "15px",
+      fontStyle: "900",
+      color: "#172029",
+      align: "center",
+      wordWrap: { width: 116, useAdvancedWrap: true },
+    });
+    bubbleText.setPosition(0, -176);
+    const width = Phaser.Math.Clamp(bubbleText.width + 24, 82, 136);
+    const height = Phaser.Math.Clamp(bubbleText.height + 14, 30, 44);
+    const top = -176 - height / 2;
     bubble.fillStyle(0xffffff, 0.94);
     bubble.lineStyle(2, 0x172029, 0.75);
-    bubble.fillRoundedRect(-84, -184, 168, 42, 8);
-    bubble.strokeRoundedRect(-84, -184, 168, 42, 8);
-    bubble.fillTriangle(-12, -142, 8, -142, -2, -130);
+    bubble.fillRoundedRect(-width / 2, top, width, height, 7);
+    bubble.strokeRoundedRect(-width / 2, top, width, height, 7);
+    bubble.fillTriangle(-10, top + height, 8, top + height, -1, top + height + 11);
   }
 
   applyCustomerDress(actor, customerKey) {
@@ -1534,6 +1552,11 @@ class BeerScene extends Phaser.Scene {
 
   updateLayout() {
     if (!this.run) return;
+    if (this.mode === "playing") {
+      this.beer.setVisible(true);
+      this.beerBody.setVisible(true);
+      this.beerLabel.setVisible(true);
+    }
     this.items.forEach((item) => {
       if (item.meta.removed) return;
       const layer = item.meta.layer || 0;
