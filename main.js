@@ -1565,9 +1565,9 @@ class BeerScene extends Phaser.Scene {
     this.shadow.fillEllipse(beerPoint.x, beerPoint.y + 35 * beerPoint.scale, 64 * beerPoint.scale, 16 * beerPoint.scale);
     this.beer.setPosition(beerPoint.x, beerPoint.y);
     this.beer.setScale(beerPoint.scale);
-    const baseAlpha = this.isFreezerPile() ? Phaser.Math.Clamp(0.32 + this.run.visibility * 0.78, 0.3, 1) : 1;
+    const baseAlpha = this.isFreezerPile() ? Phaser.Math.Clamp(0.62 + this.run.visibility * 0.38, 0.62, 1) : 1;
     this.beer.setAlpha(this.run.stealthTimer > 0 ? Math.min(baseAlpha, 0.38) : baseAlpha);
-    this.beer.setDepth(this.isFreezerPile() ? 24 - this.run.layer * 4 + this.run.lane : 14 + Math.floor(this.run.lane));
+    this.beer.setDepth(this.isFreezerPile() ? 56 : 14 + Math.floor(this.run.lane));
     this.beer.rotation = this.run.x * 0.22 + this.run.vx * 0.14 + Math.sin(this.time.now * 0.006) * 0.025;
     this.updateBeerLocator(beerPoint);
   }
