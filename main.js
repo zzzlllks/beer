@@ -3,6 +3,8 @@ const GAME_HEIGHT = 540;
 const DAY_SECONDS = 180;
 const TOTAL_SECONDS = DAY_SECONDS * 3;
 const STORAGE_KEY = "beerSimulatorMvpSave";
+const PURCHASE_CHANCE_NERF = 0.05;
+const DRESS_EDITOR_CUSTOMER_HEIGHT = 243;
 
 const scenes = [
   { key: "supermarket", name: "超市货架", shelf: "shelf_supermarket.png", bg: 0xf6d78a, wall: 0xf9edcf, floor: 0x718f94, cool: false },
@@ -775,7 +777,7 @@ class BeerScene extends Phaser.Scene {
       onComplete: () => glass.destroy(),
     });
 
-    const throwChance = Math.min(0.95, run.otherBroken * 0.07);
+    const throwChance = Math.min(0.95, run.otherBroken * 0.05);
     if (this.rng.frac() < throwChance) {
       this.setMessage(`第${run.otherBroken}瓶饮料碎了，店主忍无可忍。`);
       this.time.delayedCall(360, () => this.endRun("free", false));
@@ -931,7 +933,9 @@ class BeerScene extends Phaser.Scene {
         actor.parts.sprite.setTexture(asset);
         const targetHeight = customer.key === "drunk" ? 170 : 158;
         actor.parts.sprite.setScale(targetHeight / actor.parts.sprite.height);
+        actor.customerArtHeight = targetHeight;
       } else {
+        actor.customerArtHeight = customer.key === "demon" ? 160 : 158;
         this.drawFallbackCustomer(actor, customer);
       }
       this.applyCustomerDress(actor, customer.key);
@@ -993,21 +997,25 @@ class BeerScene extends Phaser.Scene {
     if (actor.dressItems) actor.dressItems.forEach((item) => item.destroy());
     actor.dressItems = [];
     const outfit = (save.outfits || {})[customerKey] || [];
+    const artHeight = actor.customerArtHeight || (customerKey === "drunk" ? 170 : 158);
+    const dressScale = artHeight / DRESS_EDITOR_CUSTOMER_HEIGHT;
     outfit.forEach((record) => {
       const deco = getDecorationById(record.decorationId);
       if (!deco) return;
+      const mappedX = (record.x || 0) * dressScale;
+      const mappedY = ((record.y || 0) * dressScale) - artHeight / 2;
       let dressItem;
       let baseScale = 1;
       if (deco.image && this.textures.exists(getDecorationTextureKey(deco))) {
-        dressItem = this.add.image(record.x || 0, record.y || -70, getDecorationTextureKey(deco)).setOrigin(0.5);
+        dressItem = this.add.image(mappedX, mappedY, getDecorationTextureKey(deco)).setOrigin(0.5);
         baseScale = 72 / Math.max(dressItem.width, dressItem.height);
       } else {
-        dressItem = this.add.text(record.x || 0, record.y || -70, deco.emoji || "★", {
+        dressItem = this.add.text(mappedX, mappedY, deco.emoji || "★", {
           fontFamily: "system-ui, sans-serif",
           fontSize: "30px",
         }).setOrigin(0.5);
       }
-      dressItem.setScale(baseScale * (record.scale || 1));
+      dressItem.setScale(baseScale * (record.scale || 1) * dressScale);
       dressItem.setRotation(Phaser.Math.DegToRad(record.rotation || 0));
       actor.add(dressItem);
       actor.bringToTop(dressItem);
@@ -1319,7 +1327,7 @@ class BeerScene extends Phaser.Scene {
       if (run.visibility < 0.08) chance = Math.min(chance, 0.012);
       if (run.layer === 0) chance += 0.05;
     }
-    return Phaser.Math.Clamp(chance, this.isFreezerPile() ? 0.001 : 0.02, 0.88);
+    return Phaser.Math.Clamp(chance - PURCHASE_CHANCE_NERF, 0.001, 0.83);
   }
 
   getPreferenceMultiplier(customerKey, traitKey) {
@@ -1348,7 +1356,7 @@ class BeerScene extends Phaser.Scene {
       * (labelMultipliers[run.label] || 0.8)
       * this.getDemonPreferenceMultiplier(customer, run.trait.key)
       * stealthMultiplier;
-    return Phaser.Math.Clamp(chance, 0, 0.9);
+    return Phaser.Math.Clamp(chance - PURCHASE_CHANCE_NERF, 0, 0.85);
   }
 
   endRun(ending, fromBreak) {

@@ -1,29 +1,33 @@
-# 啤酒模拟器 Web MVP
+# Act as a beer / 啤酒模拟器 Web MVP
 
-一个极简搞笑小游戏原型。玩家扮演一瓶啤酒，出生在超市货架、冰柜、便利店冷藏柜、酒吧后厨或加油站商店里。目标是在 3 天保质期内被普通顾客买走，同时避免摔碎、过期、被店主扔出店外，以及被魔王发现。
+An absurd comedy browser game where the player acts as a beer bottle trying to be bought before expiring, while avoiding falling, breaking, being thrown out by the shop owner, or being taken by the Demon King.
 
 本游戏为虚构搞笑作品。未成年人请勿饮酒，请理性饮酒。
 
-## 当前版本
+## Current Status
 
-这是可直接在浏览器运行的 Web MVP，用于：
+This is a playable Web MVP for testing, recording, sharing, and lightweight platform deployment.
 
-- 测试核心玩法
-- 手机/电脑试玩
-- 录屏
-- 发链接给别人试玩
-- 后续迁移到抖音小游戏或其他小游戏平台
+Supported targets:
 
-## 技术栈
+- Local static web server
+- GitHub Pages
+- Vercel
+- TikTok web/link distribution
+- Future TikTok/Douyin mini-game adaptation through `platform.js`
+
+TikTok note: the current version is a browser-first web build. It can be shared or tested as a TikTok web link today. A deeper TikTok/Douyin mini-game wrapper can be added later without rewriting the core game logic.
+
+## Tech Stack
 
 - HTML5
 - CSS
 - JavaScript
 - Phaser 3
-- localStorage 本地存档
-- Mock 广告，不接真实广告 SDK
+- Browser `localStorage`
+- Mock rewarded ads, no real ad SDK yet
 
-## 项目结构
+## Project Structure
 
 ```text
 index.html
@@ -32,6 +36,8 @@ main.js
 platform.js
 package.json
 vercel.json
+terms.html
+privacy.html
 DEPLOYMENT.md
 vendor/
 assets/
@@ -42,150 +48,142 @@ assets/
   decorations/
 ```
 
-## 本地运行
+## Run Locally
 
-推荐用静态服务器运行：
+Use a static server:
 
 ```bash
 python -m http.server 8000
 ```
 
-然后打开：
+Then open:
 
 ```text
 http://localhost:8000
 ```
 
-也可以使用 npm 脚本：
+Or use npm:
 
 ```bash
 npm run dev
 ```
 
-Windows PowerShell 如果拦截 `npm`，可以用：
+On Windows PowerShell, if `npm` is blocked, use:
 
 ```bash
 npm.cmd run dev
 ```
 
-## 操作方式
+## Controls
 
-手机：
+Mobile:
 
-- 倾斜手机控制啤酒滚动
-- 点击屏幕旋转标签
+- Tilt phone to roll the beer
+- Tap screen to rotate the label
 
-电脑调试：
+Desktop debug:
 
-- `A / D` 左右滚动
-- `W / S` 前后移动
-- `Space` 旋转标签
-- `1 / 2 / 3` 切换视角
+- `A / D`: roll left/right
+- `W / S`: move forward/back
+- `Space`: rotate label
+- `1 / 2 / 3`: switch fixed camera angle
 
-## 已实现玩法
+## Implemented MVP Features
 
-- 2.5D 货架/冰柜视角
-- 5 个随机场景
-- 手机倾斜与键盘调试控制
-- 标签朝向系统
-- 顾客随机出现与购买概率
-- 魔王机制与隐身贴纸
-- 冰柜堆叠/掩埋机制
-- 轻量街机物理碰撞
-- 完整度系统
-- 掉落摔碎反馈
-- 店主扔出店外结局
-- 3 天保质期倒计时
-- 积分、连胜、等待奖励
-- 结算页双倍积分广告
-- 自由贴纸式装扮系统
-- localStorage 存档
+- 2.5D shelf/freezer view
+- Five random scenes
+- Mobile tilt and keyboard debug controls
+- Label-facing system
+- Random customer system
+- Demon King danger system
+- Invisibility sticker item
+- Freezer pile/burial gameplay
+- Lightweight arcade collision physics
+- Bottle integrity system
+- Visible bottle break feedback
+- Shop owner throw-out ending
+- Three-day expiration timer
+- Score, streak, waiting reward, and risk system
+- Mock rewarded ads
+- Free sticker-style outfit editor
+- `localStorage` save data
 
-## Mock 广告
+## Mock Ads
 
-当前所有广告都是模拟广告，点击后等待 1 秒发放奖励。
+The current version does not connect to a real advertising SDK. Rewarded ad buttons simulate a 1-second delay and then grant rewards.
 
-广告位：
+Mock ad placements:
 
-- 摔碎后：看广告复活
-- 魔王出现前：看广告获得隐身贴纸
-- 结算页：看广告获得双倍积分
-- 主菜单：看广告获得积分奖励
+- Revive after breaking
+- Gain invisibility sticker before/while Demon King danger
+- Double score on settlement
+- Gain points from the main menu/shop button
 
-广告逻辑集中在：
+Ad integration is isolated in:
 
 ```text
 platform.js
 ```
 
-后续接真实广告 SDK 时优先替换这里。
+Replace the mock implementation there when adding a real TikTok/Douyin/Vercel/web ad integration.
 
-## 部署
+## Deployment
 
-GitHub 仓库：
+Repository:
 
 [https://github.com/zzzlllks/beer](https://github.com/zzzlllks/beer)
 
-完整部署说明见：
+Full deployment notes:
 
 [DEPLOYMENT.md](./DEPLOYMENT.md)
 
-支持：
-
-- 本地静态服务器
-- Vercel
-- GitHub Pages
-- 后续抖音小游戏适配
-
-快速部署到 Vercel：
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/zzzlllks/beer)
-
-```bash
-npm run deploy:vercel
-```
-
-GitHub Pages 已提供 Actions workflow：
-
-```text
-.github/workflows/deploy-pages.yml
-```
-
-GitHub Pages 预期地址：
+Expected GitHub Pages URL:
 
 ```text
 https://zzzlllks.github.io/beer/
 ```
 
-## 检查
+Vercel:
 
 ```bash
-npm run check
+npm run deploy:vercel
 ```
 
-或：
+GitHub Pages workflow:
 
-```bash
-npm.cmd run check
+```text
+.github/workflows/deploy-pages.yml
 ```
 
-## 存档
+## Legal Pages
 
-游戏使用 `localStorage` 保存：
+- [Terms of Service](./terms.html)
+- [Privacy Policy](./privacy.html)
 
-- 总积分
-- 历史最高分
-- 最高连胜
-- 通关次数
-- 失败次数
-- 顾客购买统计
-- 魔王躲避次数
-- 双倍积分广告次数
-- 装扮配置
+Current privacy behavior:
 
-## 素材扩展
+- No user account system
+- No payment system
+- No intentional personal information collection
+- Gameplay data is saved locally with `localStorage`
+- Future versions may add real advertising and update the policies
 
-推荐目录：
+## Save Data
+
+The game uses `localStorage` for:
+
+- Total points
+- Best score
+- Best streak
+- Win/failure counts
+- Customer purchase stats
+- Demon dodge count
+- Double-score ad count
+- Outfit configurations
+
+## Asset Expansion
+
+Recommended folders:
 
 ```text
 assets/beers/
@@ -195,19 +193,31 @@ assets/ui/
 assets/decorations/
 ```
 
-装饰配置：
+Decoration config:
 
 ```text
 assets/decorations/decorations.json
 ```
 
-未来新增素材时，优先通过配置扩展，尽量不要改核心玩法代码。
+Future content should be added through assets and config where possible, avoiding rewrites of core gameplay logic.
 
-## 后续计划
+## Checks
 
-- 更完整的素材配置读取
-- 图鉴 UI
-- 更多顾客与特殊顾客
-- 更多场景事件
-- 装扮商城与积分解锁
-- 抖音小游戏平台层适配
+```bash
+npm run check
+```
+
+or:
+
+```bash
+npm.cmd run check
+```
+
+## Roadmap
+
+- More complete asset/config loading
+- Codex/gallery UI
+- More customers and special customers
+- More scene events
+- Outfit shop and point unlocks
+- TikTok/Douyin mini-game platform wrapper
