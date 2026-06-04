@@ -216,6 +216,7 @@ class BeerScene extends Phaser.Scene {
     this.bg = this.add.graphics();
     this.shelf = this.add.graphics();
     this.shadow = this.add.graphics();
+    this.beerLocator = this.add.graphics();
     this.items = [];
     this.floaters = [];
     this.createBeer();
@@ -1349,6 +1350,10 @@ class BeerScene extends Phaser.Scene {
       });
     }
     this.beer.setVisible(ending !== "broken" && ending !== "free" && ending !== "demon");
+    if (ending !== "sold") {
+      this.shadow.clear();
+      this.beerLocator.clear();
+    }
     this.hideCustomer();
 
     const canRevive = ending === "broken" && fromBreak && !run.usedRevive;
@@ -1454,6 +1459,8 @@ class BeerScene extends Phaser.Scene {
     this.shelf.fillRect(118, 196, 724, 16);
     this.shelf.fillRect(118, 270, 724, 16);
     this.shelf.fillRect(118, 344, 724, 16);
+    this.shadow.clear();
+    this.beerLocator.clear();
     this.updateBeerArt();
     this.applyBeerDress();
     this.beer.setVisible(true);
@@ -1560,8 +1567,34 @@ class BeerScene extends Phaser.Scene {
     this.beer.setScale(beerPoint.scale);
     const baseAlpha = this.isFreezerPile() ? Phaser.Math.Clamp(0.32 + this.run.visibility * 0.78, 0.3, 1) : 1;
     this.beer.setAlpha(this.run.stealthTimer > 0 ? Math.min(baseAlpha, 0.38) : baseAlpha);
-    this.beer.setDepth(this.isFreezerPile() ? 22 - this.run.layer * 4 + this.run.lane : 14 + Math.floor(this.run.lane));
+    this.beer.setDepth(this.isFreezerPile() ? 24 - this.run.layer * 4 + this.run.lane : 14 + Math.floor(this.run.lane));
     this.beer.rotation = this.run.x * 0.22 + this.run.vx * 0.14 + Math.sin(this.time.now * 0.006) * 0.025;
+    this.updateBeerLocator(beerPoint);
+  }
+
+  updateBeerLocator(beerPoint) {
+    this.beerLocator.clear();
+    if (!this.isFreezerPile() || this.run.visibility >= 0.34 || this.run.stealthTimer > 0) return;
+    const pulse = 0.55 + Math.sin(this.time.now * 0.006) * 0.16;
+    const scale = beerPoint.scale;
+    this.beerLocator.setDepth(58);
+    this.beerLocator.lineStyle(3, 0xfdf4c9, pulse);
+    this.beerLocator.strokeRoundedRect(
+      beerPoint.x - 28 * scale,
+      beerPoint.y - 95 * scale,
+      56 * scale,
+      144 * scale,
+      16 * scale
+    );
+    this.beerLocator.fillStyle(0xfdf4c9, pulse);
+    this.beerLocator.fillTriangle(
+      beerPoint.x,
+      beerPoint.y - 122 * scale,
+      beerPoint.x - 10 * scale,
+      beerPoint.y - 105 * scale,
+      beerPoint.x + 10 * scale,
+      beerPoint.y - 105 * scale
+    );
   }
 
   project(x, lane) {
